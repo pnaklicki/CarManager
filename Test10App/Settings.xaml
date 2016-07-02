@@ -1,0 +1,27 @@
+﻿<Page
+    x:Class="Test10App.Settings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Test10App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,26,0,0" TextWrapping="Wrap" Text="Ustawienia" VerticalAlignment="Top" Height="51" Width="113" FontSize="22" TextAlignment="Center"/>
+        <Button x:Name="passChange" Content="Zmień hasło" HorizontalAlignment="Left" Margin="110,570,0,0" VerticalAlignment="Top" Height="33" Width="135" Click="passChange_Click" BorderBrush="#02000000"/>
+        <Popup x:Name="passChangePop">
+            <Grid Background="Black" Height="313" Width="361">
+                <PasswordBox x:Name="pass" HorizontalAlignment="Left" Margin="120,105,0,0" VerticalAlignment="Top" Width="127" Height="41" Password="" FontSize="22"/>
+                <PasswordBox x:Name="passConf" HorizontalAlignment="Left" Margin="120,194,0,0" VerticalAlignment="Top" Width="127" Height="41" Password="" FontSize="22"/>
+                <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="120,79,0,0" TextWrapping="Wrap" Text="Hasło" VerticalAlignment="Top" Height="21" Width="99"/>
+                <TextBlock x:Name="textBloc" HorizontalAlignment="Left" Margin="120,168,0,0" TextWrapping="Wrap" Text="Potwierdź hasło" VerticalAlignment="Top" Height="21" Width="99"/>
+                <TextBlock x:Name="tetBloc" HorizontalAlignment="Left" Margin="92,10,0,0" TextWrapping="Wrap" Text="Zmień hasło" VerticalAlignment="Top" Height="42" Width="184" FontSize="24"/>
+                <Button x:Name="button" Content="Zapisz" HorizontalAlignment="Left" Margin="120,266,0,0" VerticalAlignment="Top" Height="37" Width="116" Click="saveChangedPass"/>
+            </Grid>
+        </Popup>
+        <ToggleSwitch x:Name="loginRequired" HorizontalAlignment="Left" Margin="229,96,-23,0" VerticalAlignment="Top" Toggled="loginRequired_Toggled" OffContent="Nie" OnContent="Tak"/>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="29,102,0,0" TextWrapping="Wrap" Text="Wymagaj logowania" VerticalAlignment="Top" FontSize="18"/>
+
+    </Grid>
+</Page>

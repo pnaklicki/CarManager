@@ -1,0 +1,138 @@
+﻿<Page
+    x:Class="Test10App.CarDetails"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Test10App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:conv="using:Test10App.Converters" 
+    mc:Ignorable="d">
+
+    <Page.BottomAppBar>
+        <CommandBar ClosedDisplayMode="Minimal">
+            <AppBarButton Icon="Add" Label="Dodaj" Click="AddBarButton_Click"/>
+            <AppBarButton Icon="Edit" Label="Edytuj"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+
+    <Grid Tapped="Grid_Tapped" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <FlyoutBase.AttachedFlyout>
+            <MenuFlyout x:Name="RightTapMenu">
+                <MenuFlyoutItem Text="Edytuj" Click="EditRefuel" />
+            </MenuFlyout>
+        </FlyoutBase.AttachedFlyout>
+        <Pivot Name="carPivot" Title="Auto" Margin="0,0,0,30">
+            <PivotItem Header="Szczegóły">
+                <Grid HorizontalAlignment="Left" Height="525" Margin="10,10,0,0" VerticalAlignment="Top" Width="316">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,6,0,0" TextWrapping="Wrap" Text="Marka auta" VerticalAlignment="Top" Height="30" Width="116" FontSize="18"/>
+                    <TextBlock x:Name="name" HorizontalAlignment="Left" Margin="177,6,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,58,0,0" TextWrapping="Wrap" Text="Producent" VerticalAlignment="Top" Height="30" Width="86" FontSize="18"/>
+                    <TextBlock x:Name="manufacturer" HorizontalAlignment="Left" Margin="177,58,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="ihih" HorizontalAlignment="Left" Margin="10,115,0,0" TextWrapping="Wrap" Text="Rok produkcji" VerticalAlignment="Top" Height="30" Width="116" FontSize="18"/>
+                    <TextBlock x:Name="year" HorizontalAlignment="Left" Margin="177,115,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18" />
+                    <TextBlock x:Name="textBlock_Copy5" HorizontalAlignment="Left" Margin="10,173,0,0" TextWrapping="Wrap" Text="Aktualny przebieg" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="distance" HorizontalAlignment="Left" Margin="177,173,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="10,229,0,0" TextWrapping="Wrap" Text="Numer rejestracyjny" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="numbers" HorizontalAlignment="Left" Margin="177,229,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="10,289,0,0" TextWrapping="Wrap" Text="Waga auta" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="weight" HorizontalAlignment="Left" Margin="177,289,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="10,349,0,0" TextWrapping="Wrap" Text="Pojemność baku" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="vol" HorizontalAlignment="Left" Margin="177,349,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="textBlock_Copy3" HorizontalAlignment="Left" Margin="10,404,0,0" TextWrapping="Wrap" Text="Przegląd techniczny" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="tech" HorizontalAlignment="Left" Margin="177,404,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                    <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="10,457,0,0" TextWrapping="Wrap" Text="Polisa OC" VerticalAlignment="Top" Height="30" Width="162" FontSize="18"/>
+                    <TextBlock x:Name="oc" HorizontalAlignment="Left" Margin="177,457,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
+                </Grid>
+            </PivotItem>
+            <PivotItem Header="Paliwo" Margin="12,0,12,-27">
+                <Grid>
+                    <TextBlock x:Name="textBl" HorizontalAlignment="Left" Margin="10,19,0,0" TextWrapping="Wrap" Text="Średnie spalanie:" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
+                    <ListView x:Name="refuelsList" HorizontalAlignment="Left" Height="333" Margin="0,199,0,0" VerticalAlignment="Top" Width="336">
+                        <ListView.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.Resources>
+                                    </StackPanel.Resources>
+                                    <TextBlock Text="Data" FontSize="16" TextAlignment="Center" Padding="30,0,0,0"/>
+                                    <TextBlock Text="Ilość" TextAlignment="Center" FontSize="16" Padding="35,0,0,0"/>
+                                    <TextBlock Text="Cena/litr" Padding="40,0,0,0"/>
+                                    <TextBlock Text="Cena" Padding="45,0,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.HeaderTemplate>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" RightTapped="ListViewItem_RightTapped">
+                                    <StackPanel.Resources>
+                                        <conv:DateFormatConverter x:Key="DateToString"/>
+                                    </StackPanel.Resources>
+                                    <TextBlock Text="{Binding Path=Date, Converter={StaticResource DateToString}}" Padding="0,0,0,0"/>
+                                    <TextBlock Padding="25,0,0,0">
+                                        <Run Text="{Binding Volume}"/>
+                                        <Run> l</Run>
+                                    </TextBlock>
+                                    <TextBlock Padding="35,0,0,0">
+                                        <Run  Text="{Binding PricePerLitre}"/>
+                                        <Run> zł</Run>
+                                    </TextBlock>
+                                    <TextBlock Padding="25,0,0,0">
+                                        <Run Text="{Binding Price}"/>
+                                        <Run> zł</Run>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock x:Name="fuelCon" HorizontalAlignment="Left" Margin="185,19,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
+                    <TextBlock x:Name="textBl_Copy" HorizontalAlignment="Left" Margin="10,180,0,0" TextWrapping="Wrap" Text="Tankowania" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
+                    <TextBlock x:Name="price10km" HorizontalAlignment="Left" Margin="10,68,0,0" TextWrapping="Wrap" Text="Średni koszt 100 km:" VerticalAlignment="Top" Height="30" Width="316" FontSize="18"/>
+                    <TextBlock x:Name="moneyUsed" HorizontalAlignment="Left" Margin="10,122,0,0" TextWrapping="Wrap" Text="Wydatki na paliwo" VerticalAlignment="Top" Height="29" Width="316" FontSize="18"/>
+                </Grid>
+            </PivotItem>
+            <PivotItem Header="Naprawy">
+                <Grid>
+                    <ListView x:Name="repairList" HorizontalAlignment="Left" Height="333" Margin="0,199,0,0" VerticalAlignment="Top" Width="336">
+                        <ListView.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Data" FontSize="16" TextAlignment="Center" Padding="30,0,0,0"/>
+                                    <TextBlock Text="Miejsce" Padding="70,0,0,0"/>
+                                    <TextBlock Text="Cena" Padding="70,0,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.HeaderTemplate>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" RightTapped="ListViewItem_RightTapped">
+                                    <StackPanel.Resources>
+                                        <conv:DateFormatConverter x:Key="DateToString"/>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Padding" Value="20"/>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <TextBlock Text="{Binding Path=Date, Converter={StaticResource DateToString}}" Padding="5,0,0,0"/>
+                                    <TextBlock Text="{Binding Path=Place}" Padding="35,0,0,0" Width="100"/>
+                                    <TextBlock Padding="70,0,0,0">
+                                        <Run Text="{Binding Price}"/>
+                                        <Run> zł</Run>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+        <Popup Margin="70,95,73,181" Name="addPopup" >
+            <Grid  Name="popupGrid" Height="364" Width="217" CornerRadius="10" BorderThickness="4" Background="#FF131313" BorderBrush="#FF616161">
+                <Button x:Name="techBtn" Content="Przegląd techniczny" HorizontalAlignment="Left" Margin="28,51,0,0" VerticalAlignment="Top" Height="36" Width="154" Click="techAdd_Click"/>
+                <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Co chcesz dodać?" VerticalAlignment="Top" Height="32" Width="193" FontSize="18" TextAlignment="Center"/>
+                <Button x:Name="ocBtn" Content="Polisę OC" HorizontalAlignment="Left" Margin="26,104,0,0" VerticalAlignment="Top" Height="36" Width="156" Click="ocBtn_Click"/>
+                <Button x:Name="reBtn" Content="Tankowanie" HorizontalAlignment="Left" Margin="25,159,0,0" VerticalAlignment="Top" Height="36" Width="157" Click="reBtn_Click"/>
+                <Button x:Name="evBtn" Content="Wydarzenie" HorizontalAlignment="Left" Margin="23,283,0,0" VerticalAlignment="Top" Height="36" Width="157" Click="evBtn_Click"/>
+                <Button x:Name="coBtn" Content="Stan licznika" HorizontalAlignment="Left" Margin="24,220,0,0" VerticalAlignment="Top" Height="36" Width="157" Click="coBtn_Click"/>
+            </Grid>
+        </Popup>
+
+    </Grid>
+</Page>

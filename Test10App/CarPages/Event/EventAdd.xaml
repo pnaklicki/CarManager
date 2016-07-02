@@ -1,0 +1,31 @@
+﻿<Page
+    x:Class="Test10App.EventAdd"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Test10App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <TextBlock x:Name="textBloc" HorizontalAlignment="Left" Margin="10,21,0,0" TextWrapping="Wrap" Text="Dodaj wydarzenie" VerticalAlignment="Top" Height="57" Width="208" FontSize="22"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,73,0,0" TextWrapping="Wrap" Text="Rodzaj wydarzenia" VerticalAlignment="Top" Height="22" Width="147" FontSize="18"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="10,394,0,0" TextWrapping="Wrap" Text="Opis" VerticalAlignment="Top" Height="22" Width="147" FontSize="18"/>
+        <ComboBox x:Name="type" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top" Width="147" FontSize="16">
+            <ComboBoxItem Content="Naprawa"/>
+            <ComboBoxItem Content="Korekcja wizualna"/>
+            <ComboBoxItem Content="Mandat"/>
+            <ComboBoxItem Content="Inne"/>
+        </ComboBox>
+        <TextBox x:Name="description" HorizontalAlignment="Left" Margin="10,421,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="340" Height="114" FontSize="16"/>
+        <TextBox x:Name="place" HorizontalAlignment="Left" Margin="10,177,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="31" Width="147" FontSize="16"/>
+        <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="10,155,0,0" TextWrapping="Wrap" Text="Miejsce" VerticalAlignment="Top" Height="22" Width="95" FontSize="18"/>
+        <DatePicker x:Name="date" HorizontalAlignment="Left" Margin="10,250,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,227,0,0" TextWrapping="Wrap" Text="Data" VerticalAlignment="Top" FontSize="18"/>
+        <TextBox x:Name="price" HorizontalAlignment="Left" Margin="10,334,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="31" Width="147" FontSize="16" InputScope="Number"/>
+        <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="10,312,0,0" TextWrapping="Wrap" Text="Cena (opcjonalnie)" VerticalAlignment="Top" Height="22" Width="208" FontSize="18"/>
+        <Button x:Name="button" Content="Zapisz" HorizontalAlignment="Left" Margin="111,578,0,0" VerticalAlignment="Top" Width="130" Click="button_Click"/>
+
+
+    </Grid>
+</Page>
