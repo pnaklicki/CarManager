@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Test10App
 {
@@ -21,6 +22,7 @@ namespace Test10App
         public List<OCPolicy> OCPolicies { get; set; }
         public List<Refuel> Refuels { get; set; }
         public List<Event> Events { get; set; }
+        public BitmapImage CarImage { get; set; }
 
         public Car()
         {
@@ -39,6 +41,7 @@ namespace Test10App
             this.OCPolicies = new List<OCPolicy>();
             this.Refuels = new List<Refuel>();
             this.Events = new List<Event>();
+            this.CarImage = null;
             AddCarFolder(name);
         }
 
@@ -49,9 +52,35 @@ namespace Test10App
             this.OCPolicies = new List<OCPolicy>();
             this.Refuels = new List<Refuel>();
             this.Events = new List<Event>();
+            this.CarImage = null;
             if (!ifAutoAdd)
             {
                 AddCarFolder(name);
+            }
+        }
+
+        public async void LoadCarImage()
+        {
+            if (this.CarImage == null)
+            {
+                StorageFile imageFile = null;
+                try
+                {
+                    imageFile = ApplicationData.Current.LocalFolder.GetFolderAsync("Car" + this.Name).AsTask().Result.GetFilesAsync().AsTask().Result.Where(m => m.DisplayName == "CarImage").Single();
+                }
+                catch
+                {
+                    this.CarImage = null;
+                }
+                if (imageFile != null)
+                {
+                    using (var stream = await imageFile.OpenAsync(FileAccessMode.Read))
+                    {
+                        BitmapImage carImage = new BitmapImage();
+                        await carImage.SetSourceAsync(stream);
+                        this.CarImage = carImage;
+                    }
+                }
             }
         }
 
@@ -136,7 +165,10 @@ namespace Test10App
             {
                   if (item.IsOfType(Windows.Storage.StorageItemTypes.Folder) && item.Name.Contains("Car"))
                 {
-                    //item.DeleteAsync();
+                    if (!item.Name.Contains("Golf"))
+                    {
+                        //item.DeleteAsync();
+                    }
                     string refuel = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("Refuel").AsTask().Result);
                     string ocPol  = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("OCPolicy").AsTask().Result);
                     string techRev = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("TechnicalReviews").AsTask().Result);

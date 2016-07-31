@@ -118,19 +118,16 @@
     <Compile Include="CarPages\Event\EventAdd.xaml.cs">
       <DependentUpon>EventAdd.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Menu.xaml.cs">
       <DependentUpon>Menu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\OCPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Refuel.cs" />
-    <Compile Include="CarPages\Refuel\RefuelEdit.xaml.cs">
+    <Compile Include="CarPages\Refuels\RefuelEdit.xaml.cs">
       <DependentUpon>RefuelEdit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CarPages\Refuel\RefuelAdd.xaml.cs">
+    <Compile Include="CarPages\Refuels\RefuelAdd.xaml.cs">
       <DependentUpon>RefuelAdd.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings.xaml.cs">
@@ -181,19 +178,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Menu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CarPages\Refuel\RefuelEdit.xaml">
+    <Page Include="CarPages\Refuels\RefuelEdit.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="CarPages\Refuel\RefuelAdd.xaml">
+    <Page Include="CarPages\Refuels\RefuelAdd.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -206,12 +199,6 @@
     <SDKReference Include="WindowsMobile, Version=10.0.10586.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tasks\Tasks.csproj">
-      <Project>{e1c919d1-2ed4-4806-abf0-58d2ac3022d8}</Project>
-      <Name>Tasks</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

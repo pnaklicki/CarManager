@@ -72,11 +72,6 @@ namespace Test10App
                     passError.ShowAsync();
                 }
             }
-
-            if (Application.Current.Resources["Password"].ToString() == null || Application.Current.Resources["Password"].ToString() == "")
-            {
-                Frame.Navigate(typeof(MainPage));
-            }
         }
 
         private async void SavePass(string pass)

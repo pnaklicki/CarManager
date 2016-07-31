@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,6 +16,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -28,8 +33,18 @@ namespace Test10App
         public CarDetails()
         {
             this.InitializeComponent();
-            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += this.BackButtonPressed;
-            this.currentCar = ((List<Car>)Application.Current.Resources["CarList"]).Where(m=>m.Name== Application.Current.Resources["CarDetails"].ToString()).Single();
+            this.currentCar = ((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
+
+            this.carImage.Source = this.currentCar.CarImage;
+            if (this.carImage.Source != null)
+            {
+                this.addCarImageBtn.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.addCarImageBtn.Visibility = Visibility.Visible;
+            }
+
             this.carPivot.Title = this.currentCar.Name;
             this.name.Text = this.currentCar.Name;
             this.manufacturer.Text = this.currentCar.Manufacturer;
@@ -60,7 +75,7 @@ namespace Test10App
             }
 
             this.currentCar.CalculateAverageFuelUse();
-            this.refuelsList.ItemsSource = this.currentCar.Refuels;
+            this.refuelsList.ItemsSource = this.currentCar.Refuels.Reverse<Refuel>();
             
             if (this.currentCar.FuelConsumption == -1)
             {
@@ -101,16 +116,7 @@ namespace Test10App
                 this.moneyUsed.Text += " (" + DateTime.Now.ToString("MMMM") + "): " + moneyUsed.ToString() + " zł";
             }
 
-            this.repairList.ItemsSource = this.currentCar.Events.Where(m => m.Type == "Naprawa");
-        }
-
-        private void BackButtonPressed(object sender, Windows.UI.Core.BackRequestedEventArgs e)
-        {
-            if (Frame.CanGoBack)
-            {
-                Frame.GoBack();
-                e.Handled = true;
-            }
+            this.repairList.ItemsSource = this.currentCar.Events.Where(m => m.Type == "Naprawa").Reverse();
         }
 
         private void AddBarButton_Click(object sender, RoutedEventArgs e)
@@ -138,7 +144,6 @@ namespace Test10App
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
         {
             this.addPopup.IsOpen = false;
-
         }
 
         private void reBtn_Click(object sender, RoutedEventArgs e)
@@ -170,6 +175,26 @@ namespace Test10App
         private void evBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(EventAdd));
+        }
+
+        async private void addCarImageBtn_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpenPicker imagePicker = new FileOpenPicker(); imagePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            imagePicker.ViewMode = PickerViewMode.Thumbnail;
+            imagePicker.FileTypeFilter.Add(".jpg");
+            imagePicker.FileTypeFilter.Add(".jpeg");
+            imagePicker.FileTypeFilter.Add(".png");
+            BitmapImage bitImage = new BitmapImage();
+            StorageFile file = await imagePicker.PickSingleFileAsync();
+
+            var imageStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+            await bitImage.SetSourceAsync(imageStream);
+            this.carImage.Source = bitImage;
+            this.addCarImageBtn.Visibility = Visibility.Collapsed;
+            this.currentCar.CarImage = bitImage;
+            StorageFolder carFolder = ApplicationData.Current.LocalFolder.GetFolderAsync("Car" + this.currentCar.Name).AsTask().Result;
+
+            await file.CopyAsync(carFolder, "CarImage"+file.FileType);    
         }
     }
 }

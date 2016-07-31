@@ -18,6 +18,8 @@ using Windows.UI.Core;
 using Windows.UI.Notifications;
 using NotificationsExtensions.Toasts;
 using Windows.ApplicationModel.Background;
+using Windows.Foundation.Metadata;
+using Windows.UI.ViewManagement;
 
 namespace Test10App
 {
@@ -82,13 +84,18 @@ namespace Test10App
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(typeof(Menu), e.Arguments);
                 }
                 // Ensure the current window is active
                 
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
                 new Car().GetAllCars();
                 RegisterBackgroundTask("Tasks.AppBackgroundTask", "TechTask", new TimeTrigger(15, false), null);
+                if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
+                {
+                    var statusBar = StatusBar.GetForCurrentView();
+                    statusBar.HideAsync();
+                }
                 Window.Current.Activate();
             }
         }
@@ -119,15 +126,11 @@ namespace Test10App
             
             return task;
         }
-        
+
         private void OnBackRequested(object sender, BackRequestedEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-            if (rootFrame.CanGoBack)
-            {
-                rootFrame.GoBack();
-                e.Handled = true;
-            }
+            ((Frame)Window.Current.Content).GoBack();
+            e.Handled = true;
         }
 
         private async void GetSettings()
@@ -136,8 +139,6 @@ namespace Test10App
             Windows.Storage.StorageFile settings = await curFolder.CreateFileAsync("settings", Windows.Storage.CreationCollisionOption.OpenIfExists);
             Application.Current.Resources["SettingsFile"] = settings;
             string settingsText = await Windows.Storage.FileIO.ReadTextAsync(settings);
-            Application.Current.Resources["LoginRequired"] = settingsText.Contains("LoginRequired True");
-
         }
 
         

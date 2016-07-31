@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.Storage;
+using Windows.Media.SpeechRecognition;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -30,98 +31,112 @@ namespace Test10App
         private Car itemToDelete;
         public Menu()
         {
-
             this.InitializeComponent();
             List<ListViewItem> listItems = new List<ListViewItem>();
-            TimeSpan delay = TimeSpan.FromSeconds(0.6);
+            TimeSpan delay = TimeSpan.FromSeconds(1);
             object tmp = new object();
             Application.Current.Resources.TryGetValue("CarList", out tmp);
-            if (tmp != null)
+            try
             {
-                if ((List<Car>)Application.Current.Resources["CarList"] != null)
+                if (tmp != null)
                 {
-                    string carTechs = "";
-                    string ocPol = "";
+                    if ((List<Car>)Application.Current.Resources["CarList"] != null)
+                    {
+                        string carTechs = "";
+                        string ocPol = "";
+                        foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                        {
+                            ListViewItem newCar = new ListViewItem();
+                            var carButton = new Button();
+                            newCar.Content = item.Name;
+                            newCar.Tapped += CarDetail;
+                            newCar.RightTapped += ItemRightTapMenu;
+                            listItems.Add(newCar);
+                            if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive == true) != null)
+                            {
+                                if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                                {
+                                    carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                                }
+                                else
+                                {
+                                    item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
+                                }
+                            }
+                            if (item.OCPolicies.Count() > 0 && item.OCPolicies.Where(m => m.IsActive == true) != null)
+                            {
+                                if (item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                                {
+                                    ocPol += item.Name + "\t" + item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                                }
+                                else
+                                {
+                                    item.OCPolicies.Where(m => m.IsActive == true).Single().IsActive = false;
+                                }
+                            }
+                        }
+                        var settings = ApplicationData.Current.LocalSettings;
+                        settings.Values["CarsBackgroundTechs"] = carTechs;
+                        settings.Values["CarsBackgroundOC"] = ocPol;
+                    }
+                    listView.ItemsSource = listItems;
                     foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
                     {
-                        ListViewItem newCar = new ListViewItem();
-                        var carButton = new Button();
-                        newCar.Content = item.Name;
-                        newCar.Tapped += CarDetail;
-                        newCar.RightTapped += ItemRightTapMenu;
-                        listItems.Add(newCar);
-                        if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive == true) != null)
-                        {
-                            if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
-                            {
-                                carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
-                            }
-                            else
-                            {
-                                item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
-                            }
-                        }
-                        if(item.OCPolicies.Count() > 0 && item.OCPolicies.Where(m=>m.IsActive == true) != null)
-                        {
-                            if(item.OCPolicies.Where(m=>m.IsActive == true).Single().ValidTo > DateTime.Now)
-                            {
-                                ocPol += item.Name + "\t" + item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
-                            }
-                            else
-                            {
-                                item.OCPolicies.Where(m => m.IsActive == true).Single().IsActive = false;
-                            }
-                        }
+                        item.LoadCarImage();
                     }
-                    var settings = ApplicationData.Current.LocalSettings;
-                    settings.Values["CarsBackgroundTechs"] = carTechs;
-                    settings.Values["CarsBackgroundOC"] = ocPol;
                 }
-                listView.ItemsSource = listItems;
-            }
-            else
-            {
-                ThreadPoolTimer DelayTimer = ThreadPoolTimer.CreateTimer(
-                (source) =>
+                else
                 {
-                    Dispatcher.RunAsync(
-                        CoreDispatcherPriority.High,
-                        () =>
-                        {
-                            if ((List<Car>)Application.Current.Resources["CarList"] != null)
+                    ThreadPoolTimer DelayTimer = ThreadPoolTimer.CreateTimer(
+                    (source) =>
+                    {
+                        Dispatcher.RunAsync(
+                            CoreDispatcherPriority.High,
+                            () =>
                             {
-                                string carTechs = "";
-                                foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                                if ((List<Car>)Application.Current.Resources["CarList"] != null)
                                 {
-                                    ListViewItem newCar = new ListViewItem();
-                                    var carButton = new Button();
-                                    newCar.Content = item.Name;
-                                    newCar.Tapped += CarDetail;
-                                    newCar.RightTapped += ItemRightTapMenu;
-                                    listItems.Add(newCar);
-                                    if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive != true) != null)
+                                    string carTechs = "";
+                                    foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
                                     {
-                                        if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                                        ListViewItem newCar = new ListViewItem();
+                                        var carButton = new Button();
+                                        newCar.Content = item.Name;
+                                        newCar.Tapped += CarDetail;
+                                        newCar.RightTapped += ItemRightTapMenu;
+                                        listItems.Add(newCar);
+                                        if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive != true) != null)
                                         {
-                                            carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                                            if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                                            {
+                                                carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                                            }
+                                            else
+                                            {
+                                                item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
+                                            }
                                         }
-                                        else
-                                        {
-                                            item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
-                                        }
+                                        var settings = ApplicationData.Current.LocalSettings;
+                                        settings.Values["CarsBackground"] = carTechs;
                                     }
-                                    var settings = ApplicationData.Current.LocalSettings;
-                                    settings.Values["CarsBackground"] = carTechs;
+                                    listView.ItemsSource = listItems;
+
+                                    foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                                    {
+                                        item.LoadCarImage();
+                                    }
                                 }
-                                listView.ItemsSource = listItems;
+                            });
 
-                            }
-                        });
+                    }, delay);
 
-                }, delay);
+
+                }
             }
-
-            
+            catch
+            {
+                
+            }
         }
 
         private void ItemRightTapMenu(object sender, RightTappedRoutedEventArgs e)

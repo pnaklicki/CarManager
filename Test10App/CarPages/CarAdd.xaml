@@ -9,7 +9,7 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <TextBox x:Name="carName" HorizontalAlignment="Left" Margin="10,100,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="31" Width="147" FontSize="16"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,78,0,0" TextWrapping="Wrap" Text="Marka auta" VerticalAlignment="Top" Height="22" Width="95" FontSize="18"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,78,0,0" TextWrapping="Wrap" Text="Model auta" VerticalAlignment="Top" Height="22" Width="95" FontSize="18"/>
         <TextBlock x:Name="textBloc" HorizontalAlignment="Left" Margin="10,21,0,0" TextWrapping="Wrap" Text="Dodaj auto" VerticalAlignment="Top" Height="57" Width="208" FontSize="22"/>
         <Button x:Name="saveCarBtn" Content="Zapisz" HorizontalAlignment="Left" Margin="117,551,0,0" VerticalAlignment="Top" Height="40" Width="136" FontSize="20" Click="saveCarBtn_Click"/>
         <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="10,142,0,0" TextWrapping="Wrap" Text="Producent" VerticalAlignment="Top" Height="22" Width="95" FontSize="18"/>
