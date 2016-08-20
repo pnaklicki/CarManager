@@ -10,6 +10,7 @@
 
     <Page.BottomAppBar>
         <CommandBar ClosedDisplayMode="Minimal">
+            <AppBarButton x:Name="imageChange" Icon="Pictures" Label="Zmień zdjęcie" Click="addCarImageBtn_Click"/>
             <AppBarButton Icon="Add" Label="Dodaj" Click="AddBarButton_Click"/>
             <AppBarButton Icon="Edit" Label="Edytuj"/>
         </CommandBar>
@@ -42,53 +43,57 @@
                     <TextBlock x:Name="tech" HorizontalAlignment="Left" Margin="10,459,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="129" FontSize="18"/>
                     <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="194,435,0,0" TextWrapping="Wrap" Text="Polisa OC" VerticalAlignment="Top" Height="30" Width="112" FontSize="18"/>
                     <TextBlock x:Name="oc" HorizontalAlignment="Left" Margin="194,457,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="30" Width="89" FontSize="18"/>
-                    <Image x:Name="carImage" Height="178" VerticalAlignment="Top" Width="316" HorizontalAlignment="Center" IsTapEnabled="False" IsRightTapEnabled="False" IsHoldingEnabled="False" IsDoubleTapEnabled="False" Stretch="UniformToFill"/>
                     <AppBarButton x:Name="addCarImageBtn" HorizontalAlignment="Left" Icon="Add" Label="Dodaj zdjęcie" Margin="127,64,0,0" VerticalAlignment="Top" Click="addCarImageBtn_Click"/>
+                    <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Margin="0,0,0,342">
+                        <Border.Background>
+                            <ImageBrush x:Name="carImage" Stretch="UniformToFill"/>
+                        </Border.Background>
+                    </Border>
                 </Grid>
             </PivotItem>
             <PivotItem Header="Paliwo" Margin="12,0,12,-27">
                 <Grid>
                     <TextBlock x:Name="textBl" HorizontalAlignment="Left" Margin="10,19,0,0" TextWrapping="Wrap" Text="Średnie spalanie:" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
-                    <ListView x:Name="refuelsList" HorizontalAlignment="Left" Height="304" Margin="0,202,0,0" VerticalAlignment="Top" Width="336">
-                        <ListView.HeaderTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel.Resources>
-                                    </StackPanel.Resources>
-                                    <TextBlock Text="Data" FontSize="16" TextAlignment="Center" Padding="30,0,0,0"/>
-                                    <TextBlock Text="Ilość" TextAlignment="Center" FontSize="16" Padding="35,0,0,0"/>
-                                    <TextBlock Text="Cena/litr" Padding="40,0,0,0"/>
-                                    <TextBlock Text="Cena" Padding="45,0,0,0"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.HeaderTemplate>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" RightTapped="ListViewItem_RightTapped">
-                                    <StackPanel.Resources>
-                                        <conv:DateFormatConverter x:Key="DateToString"/>
-                                    </StackPanel.Resources>
-                                    <TextBlock Text="{Binding Path=Date, Converter={StaticResource DateToString}}" Padding="0,0,0,0"/>
-                                    <TextBlock Padding="25,0,0,0">
-                                        <Run Text="{Binding Volume}"/>
-                                        <Run> l</Run>
-                                    </TextBlock>
-                                    <TextBlock Padding="35,0,0,0">
-                                        <Run  Text="{Binding PricePerLitre}"/>
-                                        <Run> zł</Run>
-                                    </TextBlock>
-                                    <TextBlock Padding="25,0,0,0">
-                                        <Run Text="{Binding Price}"/>
-                                        <Run> zł</Run>
-                                    </TextBlock>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
                     <TextBlock x:Name="fuelCon" HorizontalAlignment="Left" Margin="185,19,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
-                    <TextBlock x:Name="textBl_Copy" HorizontalAlignment="Left" Margin="10,180,0,0" TextWrapping="Wrap" Text="Tankowania" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
+                    <TextBlock x:Name="textBl_Copy" HorizontalAlignment="Left" Margin="10,176,0,0" TextWrapping="Wrap" Text="Tankowania" VerticalAlignment="Top" Height="30" Width="141" FontSize="18"/>
                     <TextBlock x:Name="price10km" HorizontalAlignment="Left" Margin="10,68,0,0" TextWrapping="Wrap" Text="Średni koszt 100 km:" VerticalAlignment="Top" Height="30" Width="316" FontSize="18"/>
                     <TextBlock x:Name="moneyUsed" HorizontalAlignment="Left" Margin="10,122,0,0" TextWrapping="Wrap" Text="Wydatki na paliwo" VerticalAlignment="Top" Height="29" Width="316" FontSize="18"/>
+                    <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="276" Margin="0,206,0,0" VerticalAlignment="Top" Width="336" CornerRadius="2">
+                        <ListView x:Name="refuelsList" HorizontalAlignment="Left" Height="276" VerticalAlignment="Top" Width="336" Margin="-1">
+                            <ListView.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Data" FontSize="16" TextAlignment="Center" Padding="30,0,0,0"/>
+                                        <TextBlock Text="Ilość" TextAlignment="Center" FontSize="16" Padding="35,0,0,0"/>
+                                        <TextBlock Text="Cena/litr" Padding="40,0,0,0"/>
+                                        <TextBlock Text="Cena" Padding="45,0,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.HeaderTemplate>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" RightTapped="ListViewItem_RightTapped">
+                                        <StackPanel.Resources>
+                                            <conv:DateFormatConverter x:Key="DateToString"/>
+                                        </StackPanel.Resources>
+                                        <TextBlock Text="{Binding Date, Converter={StaticResource DateToString}}" Padding="0,0,0,0"/>
+                                        <TextBlock Padding="25,0,0,0">
+                                        <Run Text="{Binding Volume}"/>
+                                        <Run Text="l"/>
+                                        </TextBlock>
+                                        <TextBlock Padding="35,0,0,0">
+                                        <Run  Text="{Binding PricePerLitre}"/>
+                                        <Run Text="zł"/>
+                                        </TextBlock>
+                                        <TextBlock Padding="25,0,0,0">
+                                        <Run Text="{Binding Price}"/>
+                                        <Run Text="zł"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Border>
                 </Grid>
             </PivotItem>
             <PivotItem Header="Naprawy">
@@ -135,6 +140,7 @@
                 <Button x:Name="coBtn" Content="Stan licznika" HorizontalAlignment="Left" Margin="24,220,0,0" VerticalAlignment="Top" Height="36" Width="157" Click="coBtn_Click"/>
             </Grid>
         </Popup>
+
 
     </Grid>
 </Page>

@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Test10App.App">
-      <uap:VisualElements DisplayName="CarManager" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Test10App" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Car Manager" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Test10App" BackgroundColor="transparent">
         <uap:LockScreen Notification="badge" BadgeLogo="Assets\VwLogo96x96.png" />
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
@@ -38,6 +38,8 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="internetClientServer" />
+    <Capability Name="privateNetworkClientServer" />
     <uap:Capability Name="picturesLibrary" />
     <uap:Capability Name="removableStorage" />
     <uap:Capability Name="musicLibrary" />

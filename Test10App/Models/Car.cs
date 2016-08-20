@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Test10App
 {
-    class Car
+    public class Car
     {
         public string Name { get; }
         public string Manufacturer { get; set; }
@@ -152,131 +153,167 @@ namespace Test10App
             catch(System.Exception e)
             {
                 await new Windows.UI.Popups.MessageDialog("Podane auto już istnieje!", "Błąd").ShowAsync();
-                ((List<Car>)Windows.UI.Xaml.Application.Current.Resources["CarList"]).Remove(((List<Car>)Windows.UI.Xaml.Application.Current.Resources["CarList"]).Where(m => m.Name == fileName).Single());
+                App.CarList.Remove(App.CarList.Where(m => m.Name == fileName).Single());
             }
         }
 
-        public async void GetAllCars()
+        public static string[] GetCarMaintanceData(List<Car> cars)
+        {
+            string[] carMaintanceData = new string[2];
+            string carTechs = "";
+            string ocPol = "";
+                foreach (var item in cars)
+                {
+                    if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive == true) != null)
+                    {
+                        if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                        {
+                            carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                        }
+                        else
+                        {
+                            item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
+                        }
+                    }
+                    if (item.OCPolicies.Count() > 0 && item.OCPolicies.Where(m => m.IsActive == true) != null)
+                    {
+                        if (item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
+                        {
+                            ocPol += item.Name + "\t" + item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
+                        }
+                        else
+                        {
+                            item.OCPolicies.Where(m => m.IsActive == true).Single().IsActive = false;
+                        }
+                    }
+                }
+            carMaintanceData.SetValue(carTechs, 0);
+            carMaintanceData.SetValue(ocPol, 1);
+            return carMaintanceData;
+        }
+
+        public static async Task<List<Car>> GetAllCars()
         {
             List<Car> cars = new List<Car>();
            
-            IReadOnlyList<Windows.Storage.IStorageItem> carFolders = await Windows.Storage.ApplicationData.Current.LocalFolder.GetItemsAsync();
-            foreach (Windows.Storage.IStorageItem item in carFolders)
+            foreach (StorageFolder item in ApplicationData.Current.LocalFolder.GetFoldersAsync().AsTask().Result)
             {
-                  if (item.IsOfType(Windows.Storage.StorageItemTypes.Folder) && item.Name.Contains("Car"))
+                if (item.IsOfType(Windows.Storage.StorageItemTypes.Folder) && item.Name.Contains("Car"))
                 {
-                    if (!item.Name.Contains("Golf"))
-                    {
-                        //item.DeleteAsync();
-                    }
-                    string refuel = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("Refuel").AsTask().Result);
-                    string ocPol  = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("OCPolicy").AsTask().Result);
+                    string refuel = await FileIO.ReadTextAsync(item.GetFileAsync("Refuel").AsTask().Result);
+                    string ocPol = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("OCPolicy").AsTask().Result);
                     string techRev = await FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("TechnicalReviews").AsTask().Result);
                     string carDataText = await Windows.Storage.FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("Cardata").AsTask().Result);
                     string events = await Windows.Storage.FileIO.ReadTextAsync(((Windows.Storage.StorageFolder)item).GetFileAsync("Event").AsTask().Result);
 
                     string[] carData = carDataText.Split('\n');
                     Car newCar = new Car(item.Name.Substring(3), true);
-                    foreach (var option in carData)
+                    try
                     {
-                        string[] curOption = option.Split(' ');
-                        switch(curOption[0])
+                        foreach (var option in carData)
                         {
-                            case "Manufacturer":
-                                newCar.Manufacturer = curOption[1];
-                                break;
-                            case "CarYear":
-                                newCar.CarYear = curOption[1];
-                                break;
-                            case "DrivenDistance":
-                                newCar.DrivenDistance = Convert.ToInt32(curOption[1]);
-                                break;
-                            case "Volume":
-                                newCar.Volume = Convert.ToInt32(curOption[1]);
-                                break;
-                            case "Weight":
-                                newCar.Weight = Convert.ToInt32(curOption[1]);
-                                break;
-                            case "CarNumber":
-                                newCar.CarNumber = curOption[1];
-                                break;
-                        }
-                    }
-                    if (((Windows.Storage.StorageFolder)item).GetFileAsync("TechnicalReviews") != null)
-                    {
-                        bool activeTech = true;
-                        string[] reviews = techRev.Split('\n');
-
-                        foreach (var rev in reviews)
-                        {
-                            if (rev != "")
+                            string[] curOption = option.Split(' ');
+                            switch (curOption[0])
                             {
-                                string[] data = rev.Split('\t');
-                                string[] date = data[1].Split('-');
-                                newCar.TechnicalRev.Add(new TechnicalReview(new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])), data[0],activeTech));
-                                activeTech = false;
+                                case "Manufacturer":
+                                    newCar.Manufacturer = curOption[1];
+                                    break;
+                                case "CarYear":
+                                    newCar.CarYear = curOption[1];
+                                    break;
+                                case "DrivenDistance":
+                                    newCar.DrivenDistance = Convert.ToInt32(curOption[1]);
+                                    break;
+                                case "Volume":
+                                    newCar.Volume = Convert.ToInt32(curOption[1]);
+                                    break;
+                                case "Weight":
+                                    newCar.Weight = Convert.ToInt32(curOption[1]);
+                                    break;
+                                case "CarNumber":
+                                    newCar.CarNumber = curOption[1];
+                                    break;
                             }
                         }
-                    }
-
-                    if (((Windows.Storage.StorageFolder)item).GetFileAsync("OCPolicy") != null)
-                    {
-                        bool activeOC = true;
-                        string[] policies = ocPol.Split('\n');
-                        foreach (var oc in policies)
+                        if (((Windows.Storage.StorageFolder)item).GetFileAsync("TechnicalReviews") != null)
                         {
-                            if(oc != "")
-                            {
-                                string[] data = oc.Split('\t');
-                                string[] date = data[1].Split('-');
-                                newCar.OCPolicies.Add(new OCPolicy(new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])), data[0], Convert.ToInt32(data[2]),activeOC));
-                                activeOC = false;
-                            }
-                        }
-                    }
+                            bool activeTech = true;
+                            string[] reviews = techRev.Split('\n');
 
-                    if(((Windows.Storage.StorageFolder)item).GetFileAsync("Refuel") != null)
-                    {
-                        string[] refuels = refuel.Split('\n');
-                        foreach (var re in refuels)
-                        {
-                            if(re != "")
+                            foreach (var rev in reviews)
                             {
-                                bool ifFull = false,ifEmpty=false;
-                                string[] data = re.Split('\t');
-                                string[] date = data[1].Split('-');
-                                if(data[4] == "Full")
+                                if (rev != "")
                                 {
-                                    ifFull = true;
+                                    string[] data = rev.Split('\t');
+                                    string[] date = data[1].Split('-');
+                                    newCar.TechnicalRev.Add(new TechnicalReview(new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])), data[0], activeTech));
+                                    activeTech = false;
                                 }
-                                else if(data[4] == "Empty")
-                                {
-                                    ifEmpty = true;
-                                }
-                                newCar.Refuels.Add(new Refuel(Convert.ToDouble(data[0]), Convert.ToDouble(data[2]), Convert.ToInt32(data[3]),ifFull, ifEmpty, new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2]))));
                             }
                         }
-                    }
 
-                    if (((Windows.Storage.StorageFolder)item).GetFileAsync("Event") != null)
-                    {
-                        string[] events1 = events.Split('\n');
-                        foreach (var ev in events1)
+                        if (((Windows.Storage.StorageFolder)item).GetFileAsync("OCPolicy") != null)
                         {
-                            if (ev != "")
+                            bool activeOC = true;
+                            string[] policies = ocPol.Split('\n');
+                            foreach (var oc in policies)
                             {
-                                string[] data = ev.Split('\t');
-                                string[] date = data[1].Split('-');
-
-                                newCar.Events.Add(new Event(data[0], new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])),Convert.ToDouble(data[2]),data[3],data[4]));
+                                if (oc != "")
+                                {
+                                    string[] data = oc.Split('\t');
+                                    string[] date = data[1].Split('-');
+                                    newCar.OCPolicies.Add(new OCPolicy(new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])), data[0], Convert.ToInt32(data[2]), activeOC));
+                                    activeOC = false;
+                                }
                             }
                         }
+
+                        if (((Windows.Storage.StorageFolder)item).GetFileAsync("Refuel") != null)
+                        {
+                            string[] refuels = refuel.Split('\n');
+                            foreach (var re in refuels)
+                            {
+                                if (re != "")
+                                {
+                                    bool ifFull = false, ifEmpty = false;
+                                    string[] data = re.Split('\t');
+                                    string[] date = data[1].Split('-');
+                                    if (data[4] == "Full")
+                                    {
+                                        ifFull = true;
+                                    }
+                                    else if (data[4] == "Empty")
+                                    {
+                                        ifEmpty = true;
+                                    }
+                                    newCar.Refuels.Add(new Refuel(Convert.ToDouble(data[0]), Convert.ToDouble(data[2]), Convert.ToInt32(data[3]), ifFull, ifEmpty, new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2]))));
+                                }
+                            }
+                        }
+
+                        if (((Windows.Storage.StorageFolder)item).GetFileAsync("Event") != null)
+                        {
+                            string[] events1 = events.Split('\n');
+                            foreach (var ev in events1)
+                            {
+                                if (ev != "")
+                                {
+                                    string[] data = ev.Split('\t');
+                                    string[] date = data[1].Split('-');
+
+                                    newCar.Events.Add(new Event(data[0], new DateTime(Convert.ToInt32(date[0]), Convert.ToInt32(date[1]), Convert.ToInt32(date[2])), Convert.ToDouble(data[2]), data[3], data[4]));
+                                }
+                            }
+                        }
+                        cars.Add(newCar);
                     }
-                    cars.Add(newCar);
+                    catch
+                    {
+                        await new Windows.UI.Popups.MessageDialog("Wystąpił błąd podczas wczytywania danych. Spróbuj uruchomić ponownie aplikację!", "Błąd").ShowAsync();
+                    }
                 }
             }
-            Windows.UI.Xaml.Application.Current.Resources["CarList"] = cars;
-            
+            return cars;
         }
     }
 }

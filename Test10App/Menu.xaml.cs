@@ -32,110 +32,76 @@ namespace Test10App
         public Menu()
         {
             this.InitializeComponent();
-            List<ListViewItem> listItems = new List<ListViewItem>();
-            TimeSpan delay = TimeSpan.FromSeconds(1);
-            object tmp = new object();
-            Application.Current.Resources.TryGetValue("CarList", out tmp);
+
+            SetCarDataForApp();
+        }
+
+        private async void SetCarDataForApp()
+        {
+            bool ifDone = false;
             try
             {
-                if (tmp != null)
+                List<ListViewItem> listItems = new List<ListViewItem>();
+                TimeSpan delay = TimeSpan.FromSeconds(1);
+                if (App.CarList != null)
                 {
-                    if ((List<Car>)Application.Current.Resources["CarList"] != null)
+                    foreach (var item in App.CarList)
                     {
-                        string carTechs = "";
-                        string ocPol = "";
-                        foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
-                        {
-                            ListViewItem newCar = new ListViewItem();
-                            var carButton = new Button();
-                            newCar.Content = item.Name;
-                            newCar.Tapped += CarDetail;
-                            newCar.RightTapped += ItemRightTapMenu;
-                            listItems.Add(newCar);
-                            if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive == true) != null)
-                            {
-                                if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
-                                {
-                                    carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
-                                }
-                                else
-                                {
-                                    item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
-                                }
-                            }
-                            if (item.OCPolicies.Count() > 0 && item.OCPolicies.Where(m => m.IsActive == true) != null)
-                            {
-                                if (item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
-                                {
-                                    ocPol += item.Name + "\t" + item.OCPolicies.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
-                                }
-                                else
-                                {
-                                    item.OCPolicies.Where(m => m.IsActive == true).Single().IsActive = false;
-                                }
-                            }
-                        }
-                        var settings = ApplicationData.Current.LocalSettings;
-                        settings.Values["CarsBackgroundTechs"] = carTechs;
-                        settings.Values["CarsBackgroundOC"] = ocPol;
+                        ListViewItem newCar = new ListViewItem();
+                        var carButton = new Button();
+                        newCar.Content = item.Name;
+                        newCar.Tapped += ItemTappedShowDetails;
+                        newCar.RightTapped += ItemRightTapMenu;
+                        listItems.Add(newCar);
                     }
                     listView.ItemsSource = listItems;
-                    foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                    foreach (var item in App.CarList)
                     {
                         item.LoadCarImage();
                     }
+                    ifDone = true;
                 }
                 else
                 {
                     ThreadPoolTimer DelayTimer = ThreadPoolTimer.CreateTimer(
-                    (source) =>
+                    async (source) =>
                     {
-                        Dispatcher.RunAsync(
+
+                        await Dispatcher.RunAsync(
                             CoreDispatcherPriority.High,
                             () =>
                             {
-                                if ((List<Car>)Application.Current.Resources["CarList"] != null)
+                                if (App.CarList != null)
                                 {
-                                    string carTechs = "";
-                                    foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                                    foreach (var item in App.CarList)
                                     {
                                         ListViewItem newCar = new ListViewItem();
                                         var carButton = new Button();
                                         newCar.Content = item.Name;
-                                        newCar.Tapped += CarDetail;
+                                        newCar.Tapped += ItemTappedShowDetails;
                                         newCar.RightTapped += ItemRightTapMenu;
                                         listItems.Add(newCar);
-                                        if (item.TechnicalRev.Count > 0 && item.TechnicalRev.Where(m => m.IsActive != true) != null)
-                                        {
-                                            if (item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo > DateTime.Now)
-                                            {
-                                                carTechs += item.Name + "\t" + item.TechnicalRev.Where(m => m.IsActive == true).Single().ValidTo.ToString("yyyy-M-dd") + "\n";
-                                            }
-                                            else
-                                            {
-                                                item.TechnicalRev.Where(m => m.IsActive == true).Single().IsActive = false;
-                                            }
-                                        }
-                                        var settings = ApplicationData.Current.LocalSettings;
-                                        settings.Values["CarsBackground"] = carTechs;
                                     }
                                     listView.ItemsSource = listItems;
 
-                                    foreach (var item in (List<Car>)Application.Current.Resources["CarList"])
+                                    foreach (var item in App.CarList)
                                     {
                                         item.LoadCarImage();
                                     }
+                                    ifDone = true;
                                 }
                             });
 
                     }, delay);
-
-
+                }
+                if(!ifDone)
+                {
+                    throw new Exception("Wystąpił problem podczas wczytywania danych.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                
+                await new MessageDialog(ex.Message + " Spróbuj uruchomić ponownie aplikację!", "Błąd").ShowAsync();
             }
         }
 
@@ -144,12 +110,12 @@ namespace Test10App
             var holdedElement = e.OriginalSource as FrameworkElement;
             if (holdedElement != null)
             {
-                itemToDelete = ((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == ((ListViewItem)sender).Content.ToString()).Single();
+                itemToDelete = (App.CarList).Where(m => m.Name == ((ListViewItem)sender).Content.ToString()).Single();
                 RightTapMenu.ShowAt(holdedElement);
             }
         }
 
-        private void CarDetail(object sender, RoutedEventArgs e)
+        private void ItemTappedShowDetails(object sender, RoutedEventArgs e)
         {
             
             Application.Current.Resources["CarDetails"]=((ListViewItem)sender).Content;
@@ -185,7 +151,7 @@ namespace Test10App
         {
             Windows.Storage.StorageFolder curFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
             await curFolder.GetFolderAsync("Car" + itemToDelete.Name).AsTask().Result.DeleteAsync();
-            ((List<Car>)Application.Current.Resources["CarList"]).Remove(((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == itemToDelete.Name).Single());
+            (App.CarList).Remove((App.CarList).Where(m => m.Name == itemToDelete.Name).Single());
             Frame.Navigate(typeof(Menu));
             Frame.GoBack();
         }

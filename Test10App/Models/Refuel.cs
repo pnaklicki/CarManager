@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Test10App
 {
-    class Refuel
+    public class Refuel
     {
         
         public DateTime Date { get; set; }

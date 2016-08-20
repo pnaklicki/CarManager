@@ -20,6 +20,7 @@ using NotificationsExtensions.Toasts;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation.Metadata;
 using Windows.UI.ViewManagement;
+using Test10App.Models;
 
 namespace Test10App
 {
@@ -28,6 +29,8 @@ namespace Test10App
     /// </summary>
     public sealed partial class App : Application
     {
+        public static CarMaintanceChecker MaintanceChecker { get; set; }
+        public static List<Car> CarList { get; set; }
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -38,9 +41,9 @@ namespace Test10App
                 Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
                 Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
-            this.Suspending += OnSuspending;
-
-            
+            CarList = new List<Car>();
+            MaintanceChecker = new CarMaintanceChecker();
+            this.Suspending += OnSuspending;            
         }
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace Test10App
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -57,6 +60,15 @@ namespace Test10App
             }
 #endif
             Frame rootFrame = Window.Current.Content as Frame;
+
+            SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
+            CarList = await Car.GetAllCars();
+            if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
+            {
+                var statusBar = StatusBar.GetForCurrentView();
+                await statusBar.HideAsync();
+            }
+            MaintanceChecker.CheckCarMaintanceInfo(Car.GetCarMaintanceData(CarList));
             GetSettings();
 
             // Do not repeat app initialization when the Window already has content,
@@ -87,44 +99,8 @@ namespace Test10App
                     rootFrame.Navigate(typeof(Menu), e.Arguments);
                 }
                 // Ensure the current window is active
-                
-                SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
-                new Car().GetAllCars();
-                RegisterBackgroundTask("Tasks.AppBackgroundTask", "TechTask", new TimeTrigger(15, false), null);
-                if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
-                {
-                    var statusBar = StatusBar.GetForCurrentView();
-                    statusBar.HideAsync();
-                }
                 Window.Current.Activate();
             }
-        }
-
-        public static BackgroundTaskRegistration RegisterBackgroundTask(string taskEntryPoint, string taskName,IBackgroundTrigger trigger, IBackgroundCondition condition)
-        {
-            foreach (var cur in BackgroundTaskRegistration.AllTasks)
-            {
-                if (cur.Value.Name == taskName)
-                {
-                    return (BackgroundTaskRegistration)(cur.Value);
-                }
-            }
-
-            var builder = new BackgroundTaskBuilder();
-
-            builder.Name = taskName;
-            builder.TaskEntryPoint = taskEntryPoint;
-            builder.SetTrigger(trigger);
-
-            if (condition != null)
-            {
-
-                builder.AddCondition(condition);
-            }
-
-            BackgroundTaskRegistration task = builder.Register();
-            
-            return task;
         }
 
         private void OnBackRequested(object sender, BackRequestedEventArgs e)

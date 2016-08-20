@@ -37,7 +37,7 @@ namespace Test10App
             }
             else
             {
-                Car currentCar = ((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
+                Car currentCar = App.CarList.Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
 
                 if (currentCar.TechnicalRev.Count() > 0)
                 {

@@ -28,7 +28,7 @@ namespace Test10App
         public EventAdd()
         {
             this.InitializeComponent();
-            this.currentCar = ((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
+            this.currentCar = App.CarList.Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
         }
 
         private async void button_Click(object sender, RoutedEventArgs e)

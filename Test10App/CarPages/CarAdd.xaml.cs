@@ -44,19 +44,19 @@ namespace Test10App
             }
             else if (!(new Regex(@"^[^ ].+[^ ]$").Match(this.carName.Text).Success))
             {
-                await new MessageDialog("Marka auta musi zawierać minimum 3 znaki oraz pierwszy i ostatni znak nie może być spacją", "Błąd").ShowAsync();
+                await new MessageDialog("Model auta musi zawierać minimum 3 znaki oraz pierwszy i ostatni znak nie może być spacją", "Błąd").ShowAsync();
             }
             else
             {
-                if (((List<Car>)Application.Current.Resources["CarList"]).Count == 0)
+                if (App.CarList.Count == 0)
                 {
-                    ((List<Car>)Application.Current.Resources["CarList"]).Add(new Car(this.carName.Text, ((ComboBoxItem)this.manufacturer.SelectedItem).Content.ToString(), this.year.Text, Convert.ToInt32(this.distance.Text), Convert.ToInt32(this.volume.Text), Convert.ToInt32(this.weight.Text), this.numbers.Text));
+                    App.CarList.Add(new Car(this.carName.Text, ((ComboBoxItem)this.manufacturer.SelectedItem).Content.ToString(), this.year.Text, Convert.ToInt32(this.distance.Text), Convert.ToInt32(this.volume.Text), Convert.ToInt32(this.weight.Text), this.numbers.Text));
                 }
                 else
                 {
-                    if (((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == this.carName.Text).Count() == 0)
+                    if (App.CarList.Where(m => m.Name == this.carName.Text).Count() == 0)
                     {
-                        ((List<Car>)Application.Current.Resources["CarList"]).Add(new Car(this.carName.Text, ((ComboBoxItem)this.manufacturer.SelectedItem).Content.ToString(), this.year.Text, Convert.ToInt32(this.distance.Text), Convert.ToInt32(this.volume.Text), Convert.ToInt32(this.weight.Text), this.numbers.Text));
+                        App.CarList.Add(new Car(this.carName.Text, ((ComboBoxItem)this.manufacturer.SelectedItem).Content.ToString(), this.year.Text, Convert.ToInt32(this.distance.Text), Convert.ToInt32(this.volume.Text), Convert.ToInt32(this.weight.Text), this.numbers.Text));
                     }
                     else
                     {

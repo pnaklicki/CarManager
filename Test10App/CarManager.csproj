@@ -114,6 +114,7 @@
       <DependentUpon>CarDetails.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters.cs" />
+    <Compile Include="Models\CarMaintanceChecker.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="CarPages\Event\EventAdd.xaml.cs">
       <DependentUpon>EventAdd.xaml</DependentUpon>
@@ -200,7 +201,6 @@
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

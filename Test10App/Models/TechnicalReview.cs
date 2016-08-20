@@ -7,7 +7,7 @@ using Windows.UI.Xaml;
 
 namespace Test10App
 {
-    class TechnicalReview
+    public class TechnicalReview
     {
         public TechnicalReview(DateTime date, string place, bool ifActive = false)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Test10App
 {
-    class Event
+    public class Event
     {
         public string Place { get; set; }
         public DateTime Date { get; set; }

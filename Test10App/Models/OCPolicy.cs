@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Test10App
 {
-    class OCPolicy
+    public class OCPolicy
     {
         public DateTime ValidTo { get; set; }
         public string Provider { get; set; }

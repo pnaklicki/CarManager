@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -33,15 +38,28 @@ namespace Test10App
         public CarDetails()
         {
             this.InitializeComponent();
-            this.currentCar = ((List<Car>)Application.Current.Resources["CarList"]).Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
-
-            this.carImage.Source = this.currentCar.CarImage;
-            if (this.carImage.Source != null)
+            this.currentCar = App.CarList.Where(m => m.Name == Application.Current.Resources["CarDetails"].ToString()).Single();
+            try
             {
+                SetCarData();
+            }
+            catch
+            {
+                new MessageDialog("Wystąpił błąd podczas ładowania danych. Spróbuj odświeżyć okno.", "Błąd").ShowAsync();
+            }
+        }
+
+        private void SetCarData()
+        {
+            this.carImage.ImageSource = this.currentCar.CarImage;
+            if (this.carImage.ImageSource != null)
+            {
+                this.imageChange.Visibility = Visibility.Visible;
                 this.addCarImageBtn.Visibility = Visibility.Collapsed;
             }
             else
             {
+                this.imageChange.Visibility = Visibility.Collapsed;
                 this.addCarImageBtn.Visibility = Visibility.Visible;
             }
 
@@ -49,11 +67,11 @@ namespace Test10App
             this.name.Text = this.currentCar.Name;
             this.manufacturer.Text = this.currentCar.Manufacturer;
             this.year.Text = this.currentCar.CarYear;
-            this.distance.Text = this.currentCar.DrivenDistance.ToString()+" km";
+            this.distance.Text = this.currentCar.DrivenDistance.ToString() + " km";
             this.numbers.Text = this.currentCar.CarNumber;
             this.weight.Text = this.currentCar.Weight.ToString() + " kg";
-            this.vol.Text = this.currentCar.Volume.ToString()+" l";
-            if(this.currentCar.TechnicalRev.Where(m=>m.IsActive).Count() == 1)
+            this.vol.Text = this.currentCar.Volume.ToString() + " l";
+            if (this.currentCar.TechnicalRev.Where(m => m.IsActive).Count() == 1)
             {
                 this.tech.Text = "Tak";
                 this.tech.Foreground = new SolidColorBrush(Colors.DarkGreen);
@@ -76,7 +94,7 @@ namespace Test10App
 
             this.currentCar.CalculateAverageFuelUse();
             this.refuelsList.ItemsSource = this.currentCar.Refuels.Reverse<Refuel>();
-            
+
             if (this.currentCar.FuelConsumption == -1)
             {
                 this.fuelCon.Text = "Brak danych";
@@ -85,7 +103,7 @@ namespace Test10App
             {
                 this.fuelCon.Text = this.currentCar.FuelConsumption.ToString() + "l/100km";
             }
-            double averageFuelPrice = 0, refuels = 0,moneyUsed = 0;
+            double averageFuelPrice = 0, refuels = 0, moneyUsed = 0;
             if (this.currentCar.Refuels.Where(m => m.ifFullRefuel).Count() >= 3)
             {
                 foreach (var item in this.currentCar.Refuels)
@@ -98,7 +116,7 @@ namespace Test10App
                     }
                 }
                 averageFuelPrice = Math.Round(averageFuelPrice / refuels, 2);
-                this.price10km.Text += " " + (Math.Round(this.currentCar.FuelConsumption * averageFuelPrice,1)).ToString() + " zł";
+                this.price10km.Text += " " + (Math.Round(this.currentCar.FuelConsumption * averageFuelPrice, 1)).ToString() + " zł";
                 this.moneyUsed.Text += " (" + DateTime.Now.ToString("MMMM") + "): " + moneyUsed.ToString() + " zł";
             }
             else
@@ -106,7 +124,7 @@ namespace Test10App
                 this.price10km.Text += " B/D";
                 foreach (var item in this.currentCar.Refuels)
                 {
-                  
+
 
                     if (item.Date.ToString("M-yyyy") == DateTime.Now.ToString("M-yyyy"))
                     {
@@ -117,6 +135,7 @@ namespace Test10App
             }
 
             this.repairList.ItemsSource = this.currentCar.Events.Where(m => m.Type == "Naprawa").Reverse();
+
         }
 
         private void AddBarButton_Click(object sender, RoutedEventArgs e)
@@ -179,7 +198,8 @@ namespace Test10App
 
         async private void addCarImageBtn_Click(object sender, RoutedEventArgs e)
         {
-            FileOpenPicker imagePicker = new FileOpenPicker(); imagePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            FileOpenPicker imagePicker = new FileOpenPicker();
+            imagePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
             imagePicker.ViewMode = PickerViewMode.Thumbnail;
             imagePicker.FileTypeFilter.Add(".jpg");
             imagePicker.FileTypeFilter.Add(".jpeg");
@@ -187,14 +207,22 @@ namespace Test10App
             BitmapImage bitImage = new BitmapImage();
             StorageFile file = await imagePicker.PickSingleFileAsync();
 
-            var imageStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
-            await bitImage.SetSourceAsync(imageStream);
-            this.carImage.Source = bitImage;
-            this.addCarImageBtn.Visibility = Visibility.Collapsed;
-            this.currentCar.CarImage = bitImage;
-            StorageFolder carFolder = ApplicationData.Current.LocalFolder.GetFolderAsync("Car" + this.currentCar.Name).AsTask().Result;
+            if (file != null)
+            {
+                var imageStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                await bitImage.SetSourceAsync(imageStream);
+                this.carImage.ImageSource = bitImage;
+                this.addCarImageBtn.Visibility = Visibility.Collapsed;
+                this.currentCar.CarImage = bitImage;
+                StorageFolder carFolder = ApplicationData.Current.LocalFolder.GetFolderAsync("Car" + this.currentCar.Name).AsTask().Result;
 
-            await file.CopyAsync(carFolder, "CarImage"+file.FileType);    
+                if (carFolder.GetFilesAsync().AsTask().Result.Where(m=>m.DisplayName == "CarImage").Count() > 0)
+                {
+                    await carFolder.GetFilesAsync().AsTask().Result.Where(m => m.DisplayName == "CarImage").Single().DeleteAsync();
+                }
+
+                await file.CopyAsync(carFolder, "CarImage" + file.FileType);
+            }
         }
     }
 }
